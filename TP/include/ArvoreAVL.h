@@ -2,7 +2,7 @@
  * @file ArvoreAVL.h
  * @author Bruno Vieira
  * @brief TAD que faz o controle dos nos de uma árvore balanceada AVL
- * @version 0.1
+ * @version 0.2
  * @date 2025-06-23
  */
 
@@ -11,55 +11,63 @@
 #include <stdexcept>
 namespace TADS
 {
-    // Função auxiliar inline para calcular o máximo na struct
     inline int maximo(int a, int b) { return (a > b) ? a : b; }
 
-    template <typename T>
+    template <typename TipoChave, typename TipoDado>
     struct No
     {
-        T _dado;
+        TipoChave _chave;
+        TipoDado _dado;
         int altura;
-        No<T> *esq;
-        No<T> *dir;
+        No<TipoChave, TipoDado> *esq;
+        No<TipoChave, TipoDado> *dir;
 
-        No(T dado = T()) : _dado(dado), altura(1), esq(nullptr), dir(nullptr) {}
+        No(const TipoChave &chave, const TipoDado &dado)
+            : _chave(chave), _dado(dado), altura(1), esq(nullptr), dir(nullptr) {}
 
         int getBalanceamento()
         {
             int alturaDir = (dir ? dir->altura : 0);
             int alturaEsq = (esq ? esq->altura : 0);
             return alturaDir - alturaEsq;
-            // Negativo = Pesa pra Esquerda | Positivo = Pesa pra Direita
         }
 
         void novaAltura()
         {
             int alturaDir = (dir ? dir->altura : 0);
             int alturaEsq = (esq ? esq->altura : 0);
-            // Altura é 1 + a maior altura entre os filhos
             altura = 1 + maximo(alturaDir, alturaEsq);
         }
     };
 
-    template <typename T>
+    template <typename TipoChave, typename TipoDado>
     class ArvoreAVL
     {
     private:
-        No<T> *_raiz = nullptr;
+        No<TipoChave, TipoDado> *_raiz = nullptr;
 
-        void insereRecursivo(No<T> *&no, const T &dado);
-        void deletarRecursivo(No<T> *&no, const T &dado);
+        void insereRecursivo(No<TipoChave, TipoDado> *&no, const TipoChave &chave, const TipoDado &dado);
+        void deletarRecursivo(No<TipoChave, TipoDado> *&no, const TipoChave &chave);
+        No<TipoChave, TipoDado> *buscarRecursivo(No<TipoChave, TipoDado> *no, const TipoChave &chave) const;
 
-        void limparRecursivo(No<T> *no);
+        void limparRecursivo(No<TipoChave, TipoDado> *no);
 
-        void rotacionarEsq(No<T> *&no);
-        void rotacionarDir(No<T> *&no);
+        void rotacionarEsq(No<TipoChave, TipoDado> *&no);
+        void rotacionarDir(No<TipoChave, TipoDado> *&no);
 
     public:
         ArvoreAVL();
         ~ArvoreAVL();
-        void inserir(const T &dado);
-        void deletar(const T &dado);
+
+        void inserir(const TipoChave &chave, const TipoDado &dado);
+        void deletar(const TipoChave &chave);
+
+        /**
+         * @brief Busca um elemento pela chave.
+         * @param chave Chave a ser buscada.
+         * @return Ponteiro para o dado, ou nullptr se não encontrado.
+         */
+        TipoDado *buscar(const TipoChave &chave);
 
         int getAltura();
         void limpar();

@@ -1,173 +1,188 @@
 namespace TADS
 {
-    template <typename T>
-    ArvoreAVL<T>::ArvoreAVL()
+    template <typename TipoChave, typename TipoDado>
+    ArvoreAVL<TipoChave, TipoDado>::ArvoreAVL()
     {
         this->_raiz = nullptr;
     }
 
-    template <typename T>
-    ArvoreAVL<T>::~ArvoreAVL()
+    template <typename TipoChave, typename TipoDado>
+    ArvoreAVL<TipoChave, TipoDado>::~ArvoreAVL()
     {
         limpar();
     }
 
-    template <typename T>
-    void ArvoreAVL<T>::inserir(const T &dado)
+    // Inserção
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::inserir(const TipoChave &chave, const TipoDado &dado)
     {
-        insereRecursivo(this->_raiz, dado);
+        insereRecursivo(this->_raiz, chave, dado);
     }
 
-    template <typename T>
-    void ArvoreAVL<T>::insereRecursivo(No<T> *&no, const T &dado)
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::insereRecursivo(No<TipoChave, TipoDado> *&no, const TipoChave &chave, const TipoDado &dado)
     {
         if (no == nullptr)
         {
-            no = new No<T>(dado);
+            no = new No<TipoChave, TipoDado>(chave, dado);
             return;
         }
 
-        if (dado < no->_dado)
+        if (chave < no->_chave)
         {
-            insereRecursivo(no->esq, dado);
+            insereRecursivo(no->esq, chave, dado);
         }
-        else if (dado > no->_dado)
+        else if (chave > no->_chave)
         {
-            insereRecursivo(no->dir, dado);
+            insereRecursivo(no->dir, chave, dado);
         }
         else
         {
-            return; // Se o dado for repetido, encerra a função
+            no->_dado = dado;
+            return;
         }
 
         no->novaAltura();
 
-        int balanciamento = no->getBalanceamento();
+        int bal = no->getBalanceamento();
 
-        // Rotação
-
-        // Caso 1: Esquerda-Esquerda (Pesa pra Esquerda e inseriu na Esquerda)
-        if (balanciamento < -1 && dado < no->esq->_dado)
+        // Caso 1: Esquerda-Esquerda
+        if (bal < -1 && chave < no->esq->_chave)
         {
             rotacionarDir(no);
         }
-        // Caso 2: Direita-Direita (Pesa pra Direita e inseriu na Direita)
-        else if (balanciamento > 1 && dado > no->dir->_dado)
+        // Caso 2: Direita-Direita
+        else if (bal > 1 && chave > no->dir->_chave)
         {
             rotacionarEsq(no);
         }
-        // Caso 3: Esquerda-Direita (Pesa pra Esquerda, mas inseriu na Direita do filho Esq)
-        else if (balanciamento < -1 && dado > no->esq->_dado)
+        // Caso 3: Esquerda-Direita
+        else if (bal < -1 && chave > no->esq->_chave)
         {
             rotacionarEsq(no->esq);
             rotacionarDir(no);
         }
-        // Caso 4: Direita-Esquerda (Pesa pra Direita, mas inseriu na Esquerda do filho Dir)
-        else if (balanciamento > 1 && dado < no->dir->_dado)
+        // Caso 4: Direita-Esquerda
+        else if (bal > 1 && chave < no->dir->_chave)
         {
             rotacionarDir(no->dir);
             rotacionarEsq(no);
         }
     }
 
-    template <typename T>
-    void ArvoreAVL<T>::deletar(const T &dado)
+    // Remoção
+
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::deletar(const TipoChave &chave)
     {
-        deletarRecursivo(this->_raiz, dado);
+        deletarRecursivo(this->_raiz, chave);
     }
 
-    template <typename T>
-    void ArvoreAVL<T>::deletarRecursivo(No<T> *&no, const T &dado)
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::deletarRecursivo(No<TipoChave, TipoDado> *&no, const TipoChave &chave)
     {
         if (no == nullptr)
-        {
-            return; // O dado não existe na árvore
-        }
+            return;
 
-        if (dado < no->_dado)
+        if (chave < no->_chave)
         {
-            deletarRecursivo(no->esq, dado);
+            deletarRecursivo(no->esq, chave);
         }
-        else if (dado > no->_dado)
+        else if (chave > no->_chave)
         {
-            deletarRecursivo(no->dir, dado);
+            deletarRecursivo(no->dir, chave);
         }
         else
         {
-
-            // nó com 0 ou 1 filho
-            if ((no->esq == nullptr) || (no->dir == nullptr))
+            // Nó com 0 ou 1 filho
+            if (no->esq == nullptr || no->dir == nullptr)
             {
-                No<T> *temp = no->esq ? no->esq : no->dir;
+                No<TipoChave, TipoDado> *filho = no->esq ? no->esq : no->dir;
 
-                // Sem filhos (Folha)
-                if (temp == nullptr)
+                if (filho == nullptr) // Folha
                 {
-                    temp = no;
+                    delete no;
                     no = nullptr;
-                    delete temp;
                 }
-                else // Com um filho
+                else // Um filho
                 {
-                    No<T> *tempDelete = no;
-                    no = temp;         // O filho sobe para a posição do pai
-                    delete tempDelete; // Apaga o pai
+                    No<TipoChave, TipoDado> *tempDelete = no;
+                    no = filho;
+                    delete tempDelete;
                 }
             }
             else
             {
-                // nó com 2 filhos
-                // Pega o menor elemento da sub-árvore da direita (sucessor)
-                No<T> *temp = no->dir;
-                while (temp->esq != nullptr)
-                {
-                    temp = temp->esq;
-                }
+                // Nó com 2 filhos: substitui pelo sucessor (menor da subárvore direita)
+                No<TipoChave, TipoDado> *sucessor = no->dir;
+                while (sucessor->esq != nullptr)
+                    sucessor = sucessor->esq;
 
-                no->_dado = temp->_dado;
+                no->_chave = sucessor->_chave;
+                no->_dado = sucessor->_dado;
 
-                deletarRecursivo(no->dir, temp->_dado);
+                deletarRecursivo(no->dir, sucessor->_chave);
             }
         }
 
-        // Se a árvore tinha só 1 nó e foi deletado
         if (no == nullptr)
             return;
 
         no->novaAltura();
 
-        int balanciamento = no->getBalanceamento();
+        int bal = no->getBalanceamento();
 
-        // Rotações de Remoção
-
-        // Caso 1: Esquerda-Esquerda (Pesou pra esquerda, e o filho esquerdo está neutro ou pesando pra esquerda)
-        if (balanciamento < -1 && no->esq->getBalanceamento() <= 0)
+        // Caso 1: Esquerda-Esquerda
+        if (bal < -1 && no->esq->getBalanceamento() <= 0)
         {
             rotacionarDir(no);
         }
-        // Caso 3: Esquerda-Direita (Pesou pra esquerda, mas o filho esquerdo está pesando pra direita)
-        else if (balanciamento < -1 && no->esq->getBalanceamento() > 0)
+        // Caso 3: Esquerda-Direita
+        else if (bal < -1 && no->esq->getBalanceamento() > 0)
         {
             rotacionarEsq(no->esq);
             rotacionarDir(no);
         }
-        // Caso 2: Direita-Direita (Pesou pra direita, e o filho direito está neutro ou pesando pra direita)
-        else if (balanciamento > 1 && no->dir->getBalanceamento() >= 0)
+        // Caso 2: Direita-Direita
+        else if (bal > 1 && no->dir->getBalanceamento() >= 0)
         {
             rotacionarEsq(no);
         }
-        // Caso 4: Direita-Esquerda (Pesou pra direita, mas o filho direito está pesando pra esquerda)
-        else if (balanciamento > 1 && no->dir->getBalanceamento() < 0)
+        // Caso 4: Direita-Esquerda
+        else if (bal > 1 && no->dir->getBalanceamento() < 0)
         {
             rotacionarDir(no->dir);
             rotacionarEsq(no);
         }
     }
 
-    template <typename T>
-    void ArvoreAVL<T>::rotacionarDir(No<T> *&no)
+    // Busca
+
+    template <typename TipoChave, typename TipoDado>
+    TipoDado *ArvoreAVL<TipoChave, TipoDado>::buscar(const TipoChave &chave)
     {
-        No<T> *novaRaiz = no->esq;
+        No<TipoChave, TipoDado> *resultado = buscarRecursivo(this->_raiz, chave);
+        return resultado ? &resultado->_dado : nullptr;
+    }
+
+    template <typename TipoChave, typename TipoDado>
+    No<TipoChave, TipoDado> *ArvoreAVL<TipoChave, TipoDado>::buscarRecursivo(No<TipoChave, TipoDado> *no, const TipoChave &chave) const
+    {
+        if (no == nullptr || no->_chave == chave)
+            return no;
+
+        if (chave < no->_chave)
+            return buscarRecursivo(no->esq, chave);
+        else
+            return buscarRecursivo(no->dir, chave);
+    }
+
+    // Rotações
+
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::rotacionarDir(No<TipoChave, TipoDado> *&no)
+    {
+        No<TipoChave, TipoDado> *novaRaiz = no->esq;
         no->esq = novaRaiz->dir;
         novaRaiz->dir = no;
 
@@ -177,10 +192,10 @@ namespace TADS
         no = novaRaiz;
     }
 
-    template <typename T>
-    void ArvoreAVL<T>::rotacionarEsq(No<T> *&no)
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::rotacionarEsq(No<TipoChave, TipoDado> *&no)
     {
-        No<T> *novaRaiz = no->dir;
+        No<TipoChave, TipoDado> *novaRaiz = no->dir;
         no->dir = novaRaiz->esq;
         novaRaiz->esq = no;
 
@@ -190,23 +205,24 @@ namespace TADS
         no = novaRaiz;
     }
 
-    template <typename T>
-    int ArvoreAVL<T>::getAltura()
+    // Utilitários
+
+    template <typename TipoChave, typename TipoDado>
+    int ArvoreAVL<TipoChave, TipoDado>::getAltura()
     {
         return (this->_raiz != nullptr) ? this->_raiz->altura : 0;
     }
 
-    template <typename T>
-    void ArvoreAVL<T>::limpar()
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::limpar()
     {
         limparRecursivo(this->_raiz);
-        this->_raiz = nullptr; // reseta a árvore
+        this->_raiz = nullptr;
     }
 
-    template <typename T>
-    void ArvoreAVL<T>::limparRecursivo(No<T> *no)
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::limparRecursivo(No<TipoChave, TipoDado> *no)
     {
-        // Pós-Ordem: apaga esquerda, depois direita, depois o nó.
         if (no != nullptr)
         {
             limparRecursivo(no->esq);
