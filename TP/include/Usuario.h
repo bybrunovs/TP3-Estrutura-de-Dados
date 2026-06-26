@@ -16,12 +16,12 @@
 class Usuario
 {
 private:
-    unsigned _id; ///< Identificador único do utilizador, atribuído automaticamente a partir de 0[cite: 21, 22].
-    std::string _nome; ///< Nome do utilizador (sem espaços)[cite: 53].
-    unsigned _idade; ///< Idade do utilizador (inteiro não negativo)[cite: 54].
-    std::string _cidade; ///< Cidade do utilizador (sem espaços)[cite: 54].
-    std::string _estado; ///< Estado do utilizador (sem espaços)[cite: 54].
-    std::string _nacionalidade; ///< Nacionalidade do utilizador (sem espaços)[cite: 55].
+    unsigned _id;
+    std::string _nome;
+    unsigned _idade;
+    std::string _cidade;
+    std::string _estado;
+    std::string _nacionalidade;
 
 public:
     /**
@@ -31,13 +31,7 @@ public:
 
     /**
      * @brief Construtor que inicializa todos os dados do utilizador.
-     * @param id Identificador do utilizador.
-     * @param nome Nome do utilizador.
-     * @param idade Idade do utilizador.
-     * @param cidade Cidade do utilizador.
-     * @param estado Estado do utilizador.
-     * @param nacionalidade Nacionalidade do utilizador.
-     */
+    */
     Usuario(unsigned id, std::string nome, unsigned idade, std::string cidade, std::string estado, std::string nacionalidade);
 
     /**
@@ -47,39 +41,10 @@ public:
 
     // Getters
     
-    /**
-     * @brief Retorna o identificador do utilizador.
-     * @return Identificador único do utilizador.
-     */
     unsigned getId() const;
-
-    /**
-     * @brief Retorna o nome do utilizador.
-     * @return String com o nome do utilizador.
-     */
     std::string getNome() const;
-
-    /**
-     * @brief Retorna a idade do utilizador.
-     * @return Idade do utilizador.
-     */
     unsigned getIdade() const;
-
-    /**
-     * @brief Retorna a cidade do utilizador.
-     * @return String com a cidade do utilizador.
-     */
     std::string getCidade() const;
-
-    /**
-     * @brief Retorna o estado do utilizador.
-     * @return String com o estado do utilizador.
-     */
     std::string getEstado() const;
-
-    /**
-     * @brief Retorna a nacionalidade do utilizador.
-     * @return String com a nacionalidade do utilizador.
-     */
     std::string getNacionalidade() const;
 };

@@ -32,13 +32,6 @@ public:
 
     /**
      * @brief Construtor que define os dados do produto.
-     * @param id Identificador único do produto.
-     * @param nome Nome do produto.
-     * @param preco Preço de venda do produto.
-     * @param qtd Quantidade atual em estoque.
-     * @param categoria Categoria à qual o produto pertence.
-     * @param marca Marca do produto.
-     * @param condicao Condição do produto (ex: Novo, Usado).
      */
     Produto(unsigned id, std::string nome, double preco, unsigned qtd, std::string categoria, std::string marca, std::string condicao);
 

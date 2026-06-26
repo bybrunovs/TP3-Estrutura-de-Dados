@@ -15,12 +15,12 @@
 class Compra
 {
 private:
-    unsigned _id; ///< Identificador único da compra
+    unsigned _id; ///< ID único da compra
     unsigned _timestamp; ///< Instante lógico em que a compra foi realizada
-    unsigned _id_usuario; ///< Identificador do usuário que realizou a compra
-    TADS::Vector<unsigned> _id_produtos; ///< Ponteiro para arranjo com os identificadores dos produtos comprados
-    TADS::Vector<unsigned> _qtd_produtos; ///< Ponteiro para arranjo com as quantidades removidas do estoque
-    unsigned _num_produtos; ///< Número total de produtos distintos contidos nesta compra
+    unsigned _id_usuario; ///< ID do usuário que realizou a compra
+    TADS::Vector<unsigned> _id_produtos; ///< lista com os IDs dos produtos comprados
+    TADS::Vector<unsigned> _qtd_produtos; ///< lista com as quantidades removidas do estoque
+    unsigned _num_produtos; 
 
 public:
     /**
@@ -37,12 +37,14 @@ public:
      * @param qtd_produtos Arranjo dinâmico contendo as respectivas quantidades.
      * @param num_produtos O tamanho dos arranjos.
      */
-    Compra(unsigned id, unsigned timestamp, unsigned id_usuario, unsigned* id_produtos, unsigned* qtd_produtos, unsigned num_produtos);
-
+Compra(unsigned id, unsigned timestamp, unsigned id_usuario,
+       const TADS::Vector<unsigned>& id_produtos,
+       const TADS::Vector<unsigned>& qtd_produtos,
+       unsigned num_produtos);
     /**
-     * @brief Destrutor que deve liberar a memória alocada para os arranjos dinâmicos.
+     * @brief Destrutor padrão.
      */
-    ~Compra();
+    ~Compra() = default;
 
     // Getters
     unsigned getId() const;
