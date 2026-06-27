@@ -61,6 +61,7 @@ void Mercado::aplicarFiltroInt(PesquisavelInt idx, unsigned chave, TADS::ListaOr
     if (lista == nullptr)
     {
         resultado = TADS::ListaOrdenada<unsigned>();
+        primeiroFiltro = false; // filtro foi aplicado, resultado é vazio
     }
     else if (primeiroFiltro)
     {
@@ -79,6 +80,7 @@ void Mercado::aplicarFiltroString(PesquisavelString idx, const std::string &chav
     if (lista == nullptr)
     {
         resultado = TADS::ListaOrdenada<unsigned>();
+        primeiroFiltro = false; // filtro foi aplicado, resultado é vazio
     }
     else if (primeiroFiltro)
     {
@@ -383,13 +385,10 @@ void Mercado::consultarCompras(const TADS::Vector<std::string> &atributos, const
     {
         const Compra &c = _compras[resultado[i]];
 
-        // Linha 1: dados gerais da compra
-        std::cout << "LC resultado_" << i + 1
-                  << " compra " << c.getId()
-                  << " timestamp " << c.getTimestamp()
-                  << " usuario " << c.getIdUsuario() << std::endl;
+        // dados  da compra
+        std::cout << "LC resultado_" << i + 1 << " compra " << c.getId() << " timestamp " << c.getTimestamp() << " usuario " << c.getIdUsuario() << std::endl;
 
-        // Linha 2: produtos da compra em ordem crescente de id
+        // produtos da compra em ordem crescente de id
         // os produtos já são armazenados em ordem de inserção, não necessariamente ordenados
         // usamos um vetor auxiliar para garantir ordem crescente de id
         TADS::Vector<unsigned> qtdPorProduto(_produtos.tamanho(), 0);
@@ -437,12 +436,12 @@ void Mercado::consultarReposicoes(const TADS::Vector<std::string> &atributos, co
     {
         const Reposicao &r = _reposicoes[resultado[i]];
 
-        // Linha 1: dados gerais da reposição
+        // dados da reposição
         std::cout << "LR resultado_" << i + 1
                   << " reposicao " << r.getId()
                   << " timestamp " << r.getTimestamp() << std::endl;
 
-        // Linha 2: produtos da reposição em ordem crescente de id
+        //  produtos da reposição em ordem crescente de id
         TADS::Vector<unsigned> qtdPorProduto(_produtos.tamanho(), 0);
         for (unsigned k = 0; k < r.getIdProdutos().tamanho(); k++)
             qtdPorProduto[r.getIdProdutos()[k]] = r.getQtdProdutos()[k];
