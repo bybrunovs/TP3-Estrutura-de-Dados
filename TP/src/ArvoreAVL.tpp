@@ -7,6 +7,23 @@ namespace TADS
     }
 
     template <typename TipoChave, typename TipoDado>
+    ArvoreAVL<TipoChave, TipoDado>::ArvoreAVL(const ArvoreAVL &outra)
+    {
+        this->_raiz = copiarRecursivo(outra._raiz);
+    }
+
+    template <typename TipoChave, typename TipoDado>
+    ArvoreAVL<TipoChave, TipoDado> &ArvoreAVL<TipoChave, TipoDado>::operator=(const ArvoreAVL &outra)
+    {
+        if (this != &outra)
+        {
+            limpar();
+            this->_raiz = copiarRecursivo(outra._raiz);
+        }
+        return *this;
+    }
+
+    template <typename TipoChave, typename TipoDado>
     ArvoreAVL<TipoChave, TipoDado>::~ArvoreAVL()
     {
         limpar();
@@ -218,6 +235,19 @@ namespace TADS
     {
         limparRecursivo(this->_raiz);
         this->_raiz = nullptr;
+    }
+
+    template <typename TipoChave, typename TipoDado>
+    No<TipoChave, TipoDado> *ArvoreAVL<TipoChave, TipoDado>::copiarRecursivo(const No<TipoChave, TipoDado> *no) const
+    {
+        if (no == nullptr)
+            return nullptr;
+
+        No<TipoChave, TipoDado> *copia = new No<TipoChave, TipoDado>(no->_chave, no->_dado);
+        copia->altura = no->altura;
+        copia->esq = copiarRecursivo(no->esq);
+        copia->dir = copiarRecursivo(no->dir);
+        return copia;
     }
 
     template <typename TipoChave, typename TipoDado>

@@ -11,6 +11,7 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 #include "Vector.h"
 #include "ListaOrdenada.h"
@@ -89,7 +90,6 @@ private:
      * @param id    ID da entidade a associar.
      */
     void indexarString(PesquisavelString qual, const std::string &chave, unsigned id);
-
 
     void aplicarFiltroInt(PesquisavelInt idx, unsigned chave,
                           TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);

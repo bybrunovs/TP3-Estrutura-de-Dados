@@ -1,9 +1,26 @@
 #include "Mercado.h"
 
 Mercado::Mercado()
-    : _usuarios(0), _produtos(0), _compras(0), _reposicoes(0),
-      _indicesInt(10), _indicesString(8)
+    : _usuarios(0), _produtos(0), _compras(0), _reposicoes(0)
 {
+    TADS::ArvoreAVL<unsigned, TADS::ListaOrdenada<unsigned>> novaArvoreInt;
+    TADS::Vector<TADS::ArvoreAVL<unsigned, TADS::ListaOrdenada<unsigned>>> vetorInt(10, novaArvoreInt);
+    this->_indicesInt = vetorInt;
+
+    TADS::ArvoreAVL<std::string, TADS::ListaOrdenada<unsigned>> novaArvoreString;
+    TADS::Vector<TADS::ArvoreAVL<std::string, TADS::ListaOrdenada<unsigned>>> vetorString(8, novaArvoreString);
+    this->_indicesString = vetorString;
+    //     for (unsigned i = 0; i < 10; i++)
+    //     {
+    //         TADS::ArvoreAVL<unsigned, TADS::ListaOrdenada<unsigned>> novaArvore;
+    //         this->_indicesInt[i] = novaArvore;
+    //     }
+
+    //         for (unsigned i = 0; i < 8; i++)
+    //     {
+    //         TADS::ArvoreAVL<std::string, TADS::ListaOrdenada<unsigned>> novaArvore;
+    //         this->_indicesString[i] = novaArvore;
+    //     }
 }
 
 void Mercado::indexarInt(PesquisavelInt qual, unsigned chave, unsigned id)
@@ -240,13 +257,18 @@ void Mercado::consultarUsuarios(const TADS::Vector<std::string> &atributos, cons
         if (!temProduto)
             continue;
 
+        std::ostringstream oss; // para poder tirar o ultimo espaço mais fácil
         unsigned contadorProduto = 1;
         for (unsigned j = 0; j < qtdPorProduto.tamanho(); j++)
         {
             if (qtdPorProduto[j] > 0)
-                std::cout << "produto_" << contadorProduto++ << " " << j << " " << qtdPorProduto[j] << " ";
+                oss << "produto_" << contadorProduto++ << " " << j << " " << qtdPorProduto[j] << " ";
         }
-        std::cout << std::endl;
+
+        std::string linha = oss.str();
+        if (!linha.empty())
+            linha.pop_back(); // remove o último espaço
+        std::cout << linha << std::endl;
     }
 }
 
@@ -257,11 +279,16 @@ void Mercado::consultarProdutos(const TADS::Vector<std::string> &atributos, cons
 
     for (unsigned i = 0; i < atributos.tamanho(); i++)
     {
-        if      (atributos[i] == "id")        aplicarFiltroInt(PesquisavelInt::produto_id, std::stoul(valores[i]), resultado, primeiroFiltro);
-        else if (atributos[i] == "nome")      aplicarFiltroString(PesquisavelString::produto_nome, valores[i], resultado, primeiroFiltro);
-        else if (atributos[i] == "categoria") aplicarFiltroString(PesquisavelString::produto_categoria, valores[i], resultado, primeiroFiltro);
-        else if (atributos[i] == "marca")     aplicarFiltroString(PesquisavelString::produto_marca, valores[i], resultado, primeiroFiltro);
-        else if (atributos[i] == "condicao")  aplicarFiltroString(PesquisavelString::produto_condicao, valores[i], resultado, primeiroFiltro);
+        if (atributos[i] == "id")
+            aplicarFiltroInt(PesquisavelInt::produto_id, std::stoul(valores[i]), resultado, primeiroFiltro);
+        else if (atributos[i] == "nome")
+            aplicarFiltroString(PesquisavelString::produto_nome, valores[i], resultado, primeiroFiltro);
+        else if (atributos[i] == "categoria")
+            aplicarFiltroString(PesquisavelString::produto_categoria, valores[i], resultado, primeiroFiltro);
+        else if (atributos[i] == "marca")
+            aplicarFiltroString(PesquisavelString::produto_marca, valores[i], resultado, primeiroFiltro);
+        else if (atributos[i] == "condicao")
+            aplicarFiltroString(PesquisavelString::produto_condicao, valores[i], resultado, primeiroFiltro);
     }
 
     if (resultado.tamanho() == 0)
@@ -288,7 +315,8 @@ void Mercado::consultarProdutos(const TADS::Vector<std::string> &atributos, cons
         TADS::ListaOrdenada<unsigned> *idCompras =
             _indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idProduto)].buscar(idProduto);
 
-        if (idCompras == nullptr) continue;
+        if (idCompras == nullptr)
+            continue;
 
         TADS::Vector<unsigned> qtdPorUsuario(_usuarios.tamanho(), 0);
 
@@ -304,17 +332,27 @@ void Mercado::consultarProdutos(const TADS::Vector<std::string> &atributos, cons
 
         bool temUsuario = false;
         for (unsigned j = 0; j < qtdPorUsuario.tamanho(); j++)
-            if (qtdPorUsuario[j] > 0) { temUsuario = true; break; }
+            if (qtdPorUsuario[j] > 0)
+            {
+                temUsuario = true;
+                break;
+            }
 
-        if (!temUsuario) continue;
+        if (!temUsuario)
+            continue;
+
+        std::ostringstream oss; // para poder tirar o ultimo espaço mais fácil
 
         unsigned contadorUsuario = 1;
         for (unsigned j = 0; j < qtdPorUsuario.tamanho(); j++)
         {
             if (qtdPorUsuario[j] > 0)
-                std::cout << "usuario_" << contadorUsuario++ << " " << j << " " << qtdPorUsuario[j] << " ";
+                oss << "usuario_" << contadorUsuario++ << " " << j << " " << qtdPorUsuario[j] << " ";
         }
-        std::cout << std::endl;
+        std::string linha = oss.str();
+        if (!linha.empty())
+            linha.pop_back(); // remove o último espaço
+        std::cout << linha << std::endl;
     }
 }
 
@@ -325,10 +363,14 @@ void Mercado::consultarCompras(const TADS::Vector<std::string> &atributos, const
 
     for (unsigned i = 0; i < atributos.tamanho(); i++)
     {
-        if      (atributos[i] == "id")         aplicarFiltroInt(PesquisavelInt::compra_id, std::stoul(valores[i]), resultado, primeiroFiltro);
-        else if (atributos[i] == "timestamp")  aplicarFiltroInt(PesquisavelInt::compra_timestamp, std::stoul(valores[i]), resultado, primeiroFiltro);
-        else if (atributos[i] == "id_usuario") aplicarFiltroInt(PesquisavelInt::compra_idUsuario, std::stoul(valores[i]), resultado, primeiroFiltro);
-        else if (atributos[i] == "id_produto") aplicarFiltroInt(PesquisavelInt::compra_idProduto, std::stoul(valores[i]), resultado, primeiroFiltro);
+        if (atributos[i] == "id")
+            aplicarFiltroInt(PesquisavelInt::compra_id, std::stoul(valores[i]), resultado, primeiroFiltro);
+        else if (atributos[i] == "timestamp")
+            aplicarFiltroInt(PesquisavelInt::compra_timestamp, std::stoul(valores[i]), resultado, primeiroFiltro);
+        else if (atributos[i] == "id_usuario")
+            aplicarFiltroInt(PesquisavelInt::compra_idUsuario, std::stoul(valores[i]), resultado, primeiroFiltro);
+        else if (atributos[i] == "id_produto")
+            aplicarFiltroInt(PesquisavelInt::compra_idProduto, std::stoul(valores[i]), resultado, primeiroFiltro);
     }
 
     if (resultado.tamanho() == 0)
@@ -354,13 +396,19 @@ void Mercado::consultarCompras(const TADS::Vector<std::string> &atributos, const
         for (unsigned k = 0; k < c.getIdProdutos().tamanho(); k++)
             qtdPorProduto[c.getIdProdutos()[k]] = c.getQtdProdutos()[k];
 
+        std::ostringstream oss; // para poder tirar o ultimo espaço mais fácil
+
         unsigned contadorProduto = 1;
         for (unsigned j = 0; j < qtdPorProduto.tamanho(); j++)
         {
             if (qtdPorProduto[j] > 0)
-                std::cout << "produto_" << contadorProduto++ << " " << j << " " << qtdPorProduto[j] << " ";
+                oss << "produto_" << contadorProduto++ << " " << j << " " << qtdPorProduto[j] << " ";
         }
-        std::cout << std::endl;
+
+        std::string linha = oss.str();
+        if (!linha.empty())
+            linha.pop_back(); // remove o último espaço
+        std::cout << linha << std::endl;
     }
 }
 
@@ -371,9 +419,12 @@ void Mercado::consultarReposicoes(const TADS::Vector<std::string> &atributos, co
 
     for (unsigned i = 0; i < atributos.tamanho(); i++)
     {
-        if      (atributos[i] == "id")         aplicarFiltroInt(PesquisavelInt::reposicao_id, std::stoul(valores[i]), resultado, primeiroFiltro);
-        else if (atributos[i] == "timestamp")  aplicarFiltroInt(PesquisavelInt::reposicao_timestamp, std::stoul(valores[i]), resultado, primeiroFiltro);
-        else if (atributos[i] == "id_produto") aplicarFiltroInt(PesquisavelInt::reposicao_idProduto, std::stoul(valores[i]), resultado, primeiroFiltro);
+        if (atributos[i] == "id")
+            aplicarFiltroInt(PesquisavelInt::reposicao_id, std::stoul(valores[i]), resultado, primeiroFiltro);
+        else if (atributos[i] == "timestamp")
+            aplicarFiltroInt(PesquisavelInt::reposicao_timestamp, std::stoul(valores[i]), resultado, primeiroFiltro);
+        else if (atributos[i] == "id_produto")
+            aplicarFiltroInt(PesquisavelInt::reposicao_idProduto, std::stoul(valores[i]), resultado, primeiroFiltro);
     }
 
     if (resultado.tamanho() == 0)
@@ -396,12 +447,18 @@ void Mercado::consultarReposicoes(const TADS::Vector<std::string> &atributos, co
         for (unsigned k = 0; k < r.getIdProdutos().tamanho(); k++)
             qtdPorProduto[r.getIdProdutos()[k]] = r.getQtdProdutos()[k];
 
+        std::ostringstream oss; // para poder tirar o ultimo espaço mais fácil
+
         unsigned contadorProduto = 1;
         for (unsigned j = 0; j < qtdPorProduto.tamanho(); j++)
         {
             if (qtdPorProduto[j] > 0)
-                std::cout << "produto_" << contadorProduto++ << " " << j << " " << qtdPorProduto[j] << " ";
+                oss << "produto_" << contadorProduto++ << " " << j << " " << qtdPorProduto[j] << " ";
         }
-        std::cout << std::endl;
+
+        std::string linha = oss.str();
+        if (!linha.empty())
+            linha.pop_back(); // remove o último espaço
+        std::cout << linha << std::endl;
     }
 }

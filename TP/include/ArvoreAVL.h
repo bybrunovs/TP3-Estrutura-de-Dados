@@ -49,6 +49,7 @@ namespace TADS
         void insereRecursivo(No<TipoChave, TipoDado> *&no, const TipoChave &chave, const TipoDado &dado);
         void deletarRecursivo(No<TipoChave, TipoDado> *&no, const TipoChave &chave);
         No<TipoChave, TipoDado> *buscarRecursivo(No<TipoChave, TipoDado> *no, const TipoChave &chave) const;
+        No<TipoChave, TipoDado> *copiarRecursivo(const No<TipoChave, TipoDado> *no) const;
 
         void limparRecursivo(No<TipoChave, TipoDado> *no);
 
@@ -57,6 +58,8 @@ namespace TADS
 
     public:
         ArvoreAVL();
+        ArvoreAVL(const ArvoreAVL &outra);
+        ArvoreAVL &operator=(const ArvoreAVL &outra);
         ~ArvoreAVL();
 
         void inserir(const TipoChave &chave, const TipoDado &dado);

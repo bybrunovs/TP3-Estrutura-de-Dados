@@ -8,10 +8,9 @@ namespace TADS
     }
 
     template <typename T>
-    Vector<T>::Vector(unsigned capacidade) : _capacidade(capacidade), _tamanho(0)
+    Vector<T>::Vector(unsigned capacidade) : _dados(new T[capacidade]), _capacidade(capacidade), _tamanho(0)
     {
         // Aloca o buffer inicial com a capacidade especificada.
-        this->_dados = new T[capacidade];
     }
 
     template <typename T>
@@ -48,31 +47,24 @@ namespace TADS
     template <typename T>
     void Vector<T>::push_back(const T &elemento)
     {
-        // Insere no fim sempre que houver espaço disponível.
         if (this->tamanho() + 1 <= this->_capacidade)
         {
             this->_dados[this->_tamanho] = elemento;
             this->_tamanho++;
+            return;
         }
-        else
-        {
-            // Se não houver capacidade, multiplica por 2.
-            if (this->_capacidade == 0)
-            {
-                this->_capacidade = 1;
-            }
 
-            T *_novosDados = new T[(this->_capacidade * 3 + 1)/2];
-            for (unsigned i = 0; i < this->_tamanho; i++)
-            {
-                _novosDados[i] = this->_dados[i];
-            }
-            delete[] this->_dados;
-            this->_dados = _novosDados;
-            this->_capacidade *= 2;
-            this->_dados[this->_tamanho] = elemento;
-            this->_tamanho++;
+        unsigned novaCapacidade = (this->_capacidade == 0) ? 1 : this->_capacidade * 2;
+        T *_novosDados = new T[novaCapacidade];
+        for (unsigned i = 0; i < this->_tamanho; i++)
+        {
+            _novosDados[i] = this->_dados[i];
         }
+        delete[] this->_dados;
+        this->_dados = _novosDados;
+        this->_capacidade = novaCapacidade;
+        this->_dados[this->_tamanho] = elemento;
+        this->_tamanho++;
     }
 
     template <typename T>
