@@ -62,7 +62,7 @@ namespace TADS
                 this->_capacidade = 1;
             }
 
-            T *_novosDados = new T[this->_capacidade * 2];
+            T *_novosDados = new T[(this->_capacidade * 3 + 1)/2];
             for (unsigned i = 0; i < this->_tamanho; i++)
             {
                 _novosDados[i] = this->_dados[i];

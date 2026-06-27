@@ -1,16 +1,16 @@
 #!/bin/bash
 
-EXEC="TP/bin/tp2.out"
-PASTA_TESTE="testes"
+EXEC="TP/bin/tp3.out"
+PASTA_TESTE="testes/normal"
 
 TOTAL=0
 PASSOU=0
 
-for i in {1..4}
+for i in {1..6}
 do
-    IN="$PASTA_TESTE/case_$i.in"
-    EXPECTED="$PASTA_TESTE/case_$i.out"
-    OUTPUT="$PASTA_TESTE/my_case_$i.out"
+    IN="$PASTA_TESTE/$i.in"
+    EXPECTED="$PASTA_TESTE/$i.out"
+    OUTPUT="$PASTA_TESTE/my_$i.out"
 
     # Executa o programa
     "$EXEC" < "$IN" > "$OUTPUT"
