@@ -90,7 +90,7 @@ private:
      */
     void indexarString(PesquisavelString qual, const std::string &chave, unsigned id);
 
-    void indexarDouble(unsigned chave, unsigned id);
+    void indexarDouble(double chave, unsigned id);
 
     void aplicarFiltroInt(PesquisavelInt idx, unsigned chave, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);
     void aplicarFiltroString(PesquisavelString idx, const std::string &chave, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);
