@@ -68,7 +68,7 @@ private:
     // Índices invertidos por valor exato
     TADS::Vector<TADS::ArvoreAVL<unsigned, TADS::ListaOrdenada<unsigned>>> _indicesInt;
     TADS::Vector<TADS::ArvoreAVL<std::string, TADS::ListaOrdenada<unsigned>>> _indicesString;
-    TADS::ArvoreAVL<double, TADS::ListaOrdenada<unsigned>> _indicesDouble;
+    TADS::Vector<TADS::ListaOrdenada<unsigned>> _indicesDouble;
 
     /**
      * @brief Insere um id em um índice invertido inteiro.
