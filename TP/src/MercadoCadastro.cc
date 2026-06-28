@@ -60,7 +60,7 @@ void Mercado::indexarString(PesquisavelString qual, const std::string &chave, un
 }
 
 // Índice de preço (double), separado pois usa uma AVL própria (_indicesDouble)
-void Mercado::indexarDouble(unsigned chave, unsigned id)
+void Mercado::indexarDouble(double chave, unsigned id)
 {
     TADS::ListaOrdenada<unsigned> *lista = _indicesDouble.buscar(chave);
     if (lista == nullptr)

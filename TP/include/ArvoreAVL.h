@@ -20,25 +20,25 @@ namespace TADS
     {
         TipoChave _chave;
         TipoDado _dado;
-        int altura;
+        int _altura;
         No<TipoChave, TipoDado> *esq;
         No<TipoChave, TipoDado> *dir;
 
         No(const TipoChave &chave, const TipoDado &dado)
-            : _chave(chave), _dado(dado), altura(1), esq(nullptr), dir(nullptr) {}
+            : _chave(chave), _dado(dado), _altura(1), esq(nullptr), dir(nullptr) {}
 
         int getBalanceamento()
         {
-            int alturaDir = (dir ? dir->altura : 0);
-            int alturaEsq = (esq ? esq->altura : 0);
+            int alturaDir = (dir ? dir->_altura : 0);
+            int alturaEsq = (esq ? esq->_altura : 0);
             return alturaDir - alturaEsq;
         }
 
         void novaAltura()
         {
-            int alturaDir = (dir ? dir->altura : 0);
-            int alturaEsq = (esq ? esq->altura : 0);
-            altura = 1 + maximo(alturaDir, alturaEsq);
+            int alturaDir = (dir ? dir->_altura : 0);
+            int alturaEsq = (esq ? esq->_altura : 0);
+            _altura = 1 + maximo(alturaDir, alturaEsq);
         }
     };
 
@@ -89,7 +89,7 @@ namespace TADS
          * @param max Limite superior do intervalo (inclusivo).
          * @return Vector<TipoDado> com os dados encontrados.
          */
-        TADS::ListaOrdenada<TipoDado>* buscarIntervalo(const TipoChave &min, const TipoChave &max) const;
+        TADS::ListaOrdenada<TipoDado> *buscarIntervalo(const TipoChave &min, const TipoChave &max) const;
 
         int getAltura();
         void limpar();

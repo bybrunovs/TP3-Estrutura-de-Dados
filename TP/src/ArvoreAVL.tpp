@@ -227,7 +227,7 @@ namespace TADS
     template <typename TipoChave, typename TipoDado>
     int ArvoreAVL<TipoChave, TipoDado>::getAltura()
     {
-        return (this->_raiz != nullptr) ? this->_raiz->altura : 0;
+        return (this->_raiz != nullptr) ? this->_raiz->_altura : 0;
     }
 
     template <typename TipoChave, typename TipoDado>
@@ -244,7 +244,7 @@ namespace TADS
             return nullptr;
 
         No<TipoChave, TipoDado> *copia = new No<TipoChave, TipoDado>(no->_chave, no->_dado);
-        copia->altura = no->altura;
+        copia->_altura = no->_altura;
         copia->esq = copiarRecursivo(no->esq);
         copia->dir = copiarRecursivo(no->dir);
         return copia;
