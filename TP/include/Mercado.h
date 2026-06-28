@@ -103,6 +103,9 @@ private:
     void imprimirCompras(const TADS::ListaOrdenada<unsigned> &ids, const std::string &prefixo);
     void imprimirReposicoes(const TADS::ListaOrdenada<unsigned> &ids, const std::string &prefixo);
 
+    int precedencia(const std::string &op);
+    void atualizarIndiceQtd(unsigned idProd, unsigned qtdAntiga, unsigned qtdNova);
+
 public:
     Mercado();
     ~Mercado() = default;
@@ -112,11 +115,13 @@ public:
     void registrarReposicao(unsigned timestamp, const TADS::Vector<unsigned> &id_produtos, const TADS::Vector<unsigned> &qtd_produtos);
     void registrarCompra(unsigned timestamp, unsigned id_usuario, const TADS::Vector<unsigned> &id_produtos, const TADS::Vector<unsigned> &qtd_produtos);
 
+    void lerValores(const TADS::Vector<std::string> &tokens, unsigned &pos, const std::string &atributo, std::string &valor, std::string &valor2);
+
     // Consultas com booleanos e intervalos (pontos extras)
     void consultarUsuarios(const TADS::Vector<std::string> &tokens);
     void consultarProdutos(const TADS::Vector<std::string> &tokens);
     void consultarCompras(const TADS::Vector<std::string> &tokens);
     void consultarReposicoes(const TADS::Vector<std::string> &tokens);
 
-        bool eNumero(const std::string &str);
+    bool eNumero(const std::string &str);
 };
