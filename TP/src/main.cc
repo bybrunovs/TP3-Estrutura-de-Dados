@@ -6,6 +6,17 @@
 #include "Mercado.h"
 #include "Vector.h"
 
+// Verifica se uma linha de consulta contém operadores booleanos
+static bool temOperadorBooleano(const std::string &linha)
+{
+    std::stringstream ss(linha);
+    std::string token;
+    while (ss >> token)
+        if (token == "AND" || token == "OR" || token == "NOT")
+            return true;
+    return false;
+}
+
 int main(int argc, char *argv[])
 {
     try
@@ -16,7 +27,8 @@ int main(int argc, char *argv[])
 
         while (std::getline(std::cin, linha))
         {
-            if (linha.empty()) continue;
+            if (linha.empty())
+                continue;
 
             std::stringstream ss(linha);
             ss >> token;
@@ -26,7 +38,7 @@ int main(int argc, char *argv[])
                 std::string nome, cidade, estado, nacionalidade;
                 unsigned idade;
                 ss >> nome >> idade >> cidade >> estado >> nacionalidade;
-                
+
                 mercado.cadastrarUsuario(nome, idade, cidade, estado, nacionalidade);
             }
             else if (token == "P")
@@ -35,7 +47,7 @@ int main(int argc, char *argv[])
                 double preco;
                 unsigned qtd_inicial;
                 ss >> nome >> preco >> qtd_inicial >> categoria >> marca >> condicao;
-                
+
                 mercado.cadastrarProduto(nome, preco, qtd_inicial, categoria, marca, condicao);
             }
             else if (token == "R")
@@ -47,8 +59,8 @@ int main(int argc, char *argv[])
                 TADS::Vector<unsigned> qtd_produtos;
                 unsigned temp_id, temp_qtd;
 
-                // Extrai identificadores e quantidades dinamicamente
-                while (ss >> temp_id >> temp_qtd) {
+                while (ss >> temp_id >> temp_qtd)
+                {
                     id_produtos.push_back(temp_id);
                     qtd_produtos.push_back(temp_qtd);
                 }
@@ -64,8 +76,8 @@ int main(int argc, char *argv[])
                 TADS::Vector<unsigned> qtd_produtos;
                 unsigned temp_id, temp_qtd;
 
-                // Extrai identificadores e quantidades dinamicamente
-                while (ss >> temp_id >> temp_qtd) {
+                while (ss >> temp_id >> temp_qtd)
+                {
                     id_produtos.push_back(temp_id);
                     qtd_produtos.push_back(temp_qtd);
                 }
@@ -74,29 +86,68 @@ int main(int argc, char *argv[])
             }
             else if (token == "LU" || token == "LP" || token == "LC" || token == "LR")
             {
-                TADS::Vector<std::string> atributos;
-                TADS::Vector<std::string> valores;
-                std::string temp_attr, temp_val;
-                
-                // Extrai pares de filtros dinamicamente
-                while (ss >> temp_attr >> temp_val) {
-                    atributos.push_back(temp_attr);
-                    valores.push_back(temp_val);
+
+                TADS::Vector<std::string> tokens;
+                std::string t;
+
+                if (!temOperadorBooleano(linha))
+                {
+                    TADS::Vector<std::string> lidos;
+                    while (ss >> t)
+                        lidos.push_back(t);
+
+                    unsigned k = 0;
+                    while (k < lidos.tamanho())
+                    {
+                        if (k != 0)
+                            tokens.push_back("AND");
+
+                        tokens.push_back(lidos[k]); // atributo
+                        k++;
+
+                        if (k < lidos.tamanho())
+                        {
+                            tokens.push_back(lidos[k]); // valor
+                            k++;
+                        }
+
+                        // verifica se o próximo token é segundo valor de intervalo (numérico)
+                        if (k < lidos.tamanho() && mercado.eNumero(lidos[k]))
+                        {
+                            tokens.push_back(lidos[k]); // max do intervalo
+                            k++;
+                        }
+                    }
                 }
 
-                if (token == "LU") {
-                    mercado.consultarUsuarios(atributos, valores);
-                } else if (token == "LP") {
-                    mercado.consultarProdutos(atributos, valores);
-                } else if (token == "LC") {
-                    mercado.consultarCompras(atributos, valores);
-                } else if (token == "LR") {
-                    mercado.consultarReposicoes(atributos, valores);
+                else
+                {
+                    while (ss >> t)
+                    {
+                        tokens.push_back(t);
+                    }
+                }
+
+                if (token == "LU")
+                {
+                    mercado.consultarUsuarios(tokens);
+                }
+                else if (token == "LP")
+                {
+                    mercado.consultarProdutos(tokens);
+                }
+                else if (token == "LC")
+                {
+                    mercado.consultarCompras(tokens);
+                }
+                else if (token == "LR")
+                {
+                    mercado.consultarReposicoes(tokens);
                 }
             }
             else
             {
-                throw std::invalid_argument("Comando inválido: " + token);
+                throw std::invalid_argument("Comando invalido: " + token);
             }
         }
     }

@@ -2,8 +2,8 @@
  * @file Mercado.h
  * @author Bruno Vieira
  * @brief Classe central que controla o sistema de um mercado.
- * @version 0.3
- * @date 2025-06-23
+ * @version 0.4
+ * @date 2025-06-27
  */
 
 #pragma once
@@ -32,7 +32,8 @@ enum class PesquisavelInt
     compra_id = 6,
     compra_timestamp = 7,
     compra_idUsuario = 8,
-    compra_idProduto = 9
+    compra_idProduto = 9,
+    produto_qtd = 10,
 };
 
 enum class PesquisavelString
@@ -49,9 +50,6 @@ enum class PesquisavelString
 
 /**
  * @brief Classe central que controla o sistema do MercadoDCC.
- *
- * Responsável por gerenciar os cadastros, realizar validações de estoque
- * e processar consultas multiatributo através de índices invertidos.
  */
 class Mercado
 {
@@ -67,9 +65,10 @@ private:
     TADS::Vector<Compra> _compras;
     TADS::Vector<Reposicao> _reposicoes;
 
-    // Índices invertidos
+    // Índices invertidos por valor exato
     TADS::Vector<TADS::ArvoreAVL<unsigned, TADS::ListaOrdenada<unsigned>>> _indicesInt;
     TADS::Vector<TADS::ArvoreAVL<std::string, TADS::ListaOrdenada<unsigned>>> _indicesString;
+    TADS::ArvoreAVL<double, TADS::ListaOrdenada<unsigned>> _indicesDouble;
 
     /**
      * @brief Insere um id em um índice invertido inteiro.
@@ -91,11 +90,18 @@ private:
      */
     void indexarString(PesquisavelString qual, const std::string &chave, unsigned id);
 
-    void aplicarFiltroInt(PesquisavelInt idx, unsigned chave,
-                          TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);
+    void indexarDouble(unsigned chave, unsigned id);
 
-    void aplicarFiltroString(PesquisavelString idx, const std::string &chave,
-                             TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);
+    void aplicarFiltroInt(PesquisavelInt idx, unsigned chave, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);
+    void aplicarFiltroString(PesquisavelString idx, const std::string &chave, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);
+    void aplicarFiltroIntervaloInt(PesquisavelInt idx, unsigned min, unsigned max, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);
+    void aplicarFiltroIntervaloDouble(double min, double max, TADS::ListaOrdenada<unsigned int> &resultado, bool &primeiroFiltro);
+
+    // Helpers de impressão (reutilizados pelas consultas simples e booleanas)
+    void imprimirUsuarios(const TADS::ListaOrdenada<unsigned> &ids, const std::string &prefixo);
+    void imprimirProdutos(const TADS::ListaOrdenada<unsigned> &ids, const std::string &prefixo);
+    void imprimirCompras(const TADS::ListaOrdenada<unsigned> &ids, const std::string &prefixo);
+    void imprimirReposicoes(const TADS::ListaOrdenada<unsigned> &ids, const std::string &prefixo);
 
 public:
     Mercado();
@@ -106,8 +112,11 @@ public:
     void registrarReposicao(unsigned timestamp, const TADS::Vector<unsigned> &id_produtos, const TADS::Vector<unsigned> &qtd_produtos);
     void registrarCompra(unsigned timestamp, unsigned id_usuario, const TADS::Vector<unsigned> &id_produtos, const TADS::Vector<unsigned> &qtd_produtos);
 
-    void consultarUsuarios(const TADS::Vector<std::string> &atributos, const TADS::Vector<std::string> &valores);
-    void consultarProdutos(const TADS::Vector<std::string> &atributos, const TADS::Vector<std::string> &valores);
-    void consultarCompras(const TADS::Vector<std::string> &atributos, const TADS::Vector<std::string> &valores);
-    void consultarReposicoes(const TADS::Vector<std::string> &atributos, const TADS::Vector<std::string> &valores);
+    // Consultas com booleanos e intervalos (pontos extras)
+    void consultarUsuarios(const TADS::Vector<std::string> &tokens);
+    void consultarProdutos(const TADS::Vector<std::string> &tokens);
+    void consultarCompras(const TADS::Vector<std::string> &tokens);
+    void consultarReposicoes(const TADS::Vector<std::string> &tokens);
+
+        bool eNumero(const std::string &str);
 };

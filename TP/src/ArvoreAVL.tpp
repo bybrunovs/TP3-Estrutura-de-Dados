@@ -261,4 +261,30 @@ namespace TADS
         }
     }
 
+    template <typename TipoChave, typename TipoDado>
+    TADS::ListaOrdenada<TipoDado> *ArvoreAVL<TipoChave, TipoDado>::buscarIntervalo(const TipoChave &min, const TipoChave &max) const
+    {
+        TADS::ListaOrdenada<TipoDado> *resultado = new TADS::ListaOrdenada<TipoDado>();
+        intervaloRecursivo(this->_raiz, min, max, *resultado);
+        return resultado;
+    }
+
+    template <typename TipoChave, typename TipoDado>
+    void ArvoreAVL<TipoChave, TipoDado>::intervaloRecursivo(No<TipoChave, TipoDado> *no, const TipoChave &min, const TipoChave &max, TADS::ListaOrdenada<TipoDado> &resultado) const
+    {
+        if (no == nullptr)
+            return;
+
+        // Se a chave atual é maior que min, pode haver resultados na subárvore esquerda
+        if (min < no->_chave)
+            intervaloRecursivo(no->esq, min, max, resultado);
+
+        // Visita o nó atual se estiver dentro do intervalo
+        if (min <= no->_chave && no->_chave <= max)
+            resultado.inserir(no->_dado);
+
+        // Se a chave atual é menor que max, pode haver resultados na subárvore direita
+        if (no->_chave < max)
+            intervaloRecursivo(no->dir, min, max, resultado);
+    }
 } // namespace TADS

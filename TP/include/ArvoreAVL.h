@@ -2,13 +2,15 @@
  * @file ArvoreAVL.h
  * @author Bruno Vieira
  * @brief TAD que faz o controle dos nos de uma árvore balanceada AVL
- * @version 0.2
+ * @version 0.3
  * @date 2025-06-23
  */
 
 #pragma once
 
 #include <stdexcept>
+#include "Vector.h"
+
 namespace TADS
 {
     inline int maximo(int a, int b) { return (a > b) ? a : b; }
@@ -56,6 +58,11 @@ namespace TADS
         void rotacionarEsq(No<TipoChave, TipoDado> *&no);
         void rotacionarDir(No<TipoChave, TipoDado> *&no);
 
+        /**
+         * @brief Percorre in-order coletando dados cujas chaves estão em [min, max].
+         */
+        void intervaloRecursivo(No<TipoChave, TipoDado> *no, const TipoChave &min, const TipoChave &max, TADS::ListaOrdenada<TipoDado> &resultado) const;
+
     public:
         ArvoreAVL();
         ArvoreAVL(const ArvoreAVL &outra);
@@ -71,6 +78,18 @@ namespace TADS
          * @return Ponteiro para o dado, ou nullptr se não encontrado.
          */
         TipoDado *buscar(const TipoChave &chave);
+
+        /**
+         * @brief Retorna um Vector com os dados de todos os nós cuja chave está em [min, max].
+         *
+         * Os dados são retornados em ordem crescente de chave (in-order).
+         * Complexidade: O(log n + k), onde k é o número de resultados.
+         *
+         * @param min Limite inferior do intervalo (inclusivo).
+         * @param max Limite superior do intervalo (inclusivo).
+         * @return Vector<TipoDado> com os dados encontrados.
+         */
+        TADS::ListaOrdenada<TipoDado>* buscarIntervalo(const TipoChave &min, const TipoChave &max) const;
 
         int getAltura();
         void limpar();

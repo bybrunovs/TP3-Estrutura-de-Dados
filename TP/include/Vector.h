@@ -66,6 +66,8 @@ namespace TADS
          */
         void push_back(const T &elemento);
 
+        void pop_back();
+
         /**
          * @brief Retorna uma referência ao elemento no índice especificado.
          * @param indice Índice do elemento.

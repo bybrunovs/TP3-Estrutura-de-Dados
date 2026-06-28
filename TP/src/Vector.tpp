@@ -68,6 +68,12 @@ namespace TADS
     }
 
     template <typename T>
+    void Vector<T>::pop_back()
+    {
+        this->_tamanho--;
+    }
+
+    template <typename T>
     T &Vector<T>::getElemento(unsigned indice)
     {
         if (indice < _tamanho)

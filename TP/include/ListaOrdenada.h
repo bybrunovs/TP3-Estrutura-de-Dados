@@ -97,9 +97,23 @@ namespace TADS
 
 #include "../src/ListaOrdenada.tpp"
 
-
 namespace TADS
 {
+    template <typename T>
+    bool operator<(const ListaOrdenada<T> &a, const ListaOrdenada<T> &b)
+    {
+        unsigned i = 0;
+        while (i < a.tamanho() && i < b.tamanho())
+        {
+            if (a[i] < b[i])
+                return true;
+            if (a[i] > b[i])
+                return false;
+            i++;
+        }
+        return a.tamanho() < b.tamanho();
+    }
+
     /**
      * @brief Retorna uma nova ListaOrdenada com os elementos presentes em ambas as listas.
      *
@@ -131,4 +145,59 @@ namespace TADS
 
         return resultado;
     }
+
+    inline ListaOrdenada<unsigned> complemento(const TADS::ListaOrdenada<unsigned> &lista, unsigned tamanhoUniverso)
+    {
+        TADS::ListaOrdenada<unsigned> resultado;
+        unsigned j = 0;
+        for (unsigned i = 0; i < tamanhoUniverso; i++)
+        {
+            // pula elementos da lista que sejam menores que i
+            while (j < lista.tamanho() && lista[j] < i)
+                j++;
+            if (j >= lista.tamanho() || lista[j] != i)
+                resultado.inserir(i);
+        }
+        return resultado;
+    }
+
+    inline ListaOrdenada<unsigned> uniao(const TADS::ListaOrdenada<unsigned> &a, const TADS::ListaOrdenada<unsigned> &b)
+    {
+        TADS::ListaOrdenada<unsigned> resultado;
+        unsigned i = 0, j = 0;
+        while (i < a.tamanho() && j < b.tamanho())
+        {
+            if (a[i] == b[j])
+            {
+                resultado.inserir(a[i]);
+                i++;
+                j++;
+            }
+            else if (a[i] < b[j])
+            {
+                resultado.inserir(a[i]);
+                i++;
+            }
+            else
+            {
+                resultado.inserir(b[j]);
+                j++;
+            }
+        }
+
+        while (i < a.tamanho())
+        {
+            resultado.inserir(a[i]);
+            i++;
+        }
+
+        while (j < b.tamanho())
+        {
+            resultado.inserir(b[j]);
+            j++;
+        }
+
+        return resultado;
+    }
+
 }
