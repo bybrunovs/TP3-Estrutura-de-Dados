@@ -39,7 +39,7 @@ void Mercado::imprimirUsuarios(const TADS::ListaOrdenada<unsigned> &ids, const s
         TADS::ListaOrdenada<unsigned> *idCompras = nullptr;
         
         if (pos != -1) {
-            idCompras = &_indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idUsuario)][pos].ids;
+            idCompras = _indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idUsuario)][pos].ids;
         }
         
         if (idCompras == nullptr) continue;
@@ -80,7 +80,7 @@ void Mercado::imprimirProdutos(const TADS::ListaOrdenada<unsigned> &ids, const s
         TADS::ListaOrdenada<unsigned> *idCompras = nullptr;
         
         if (pos != -1) {
-            idCompras = &_indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idProduto)][pos].ids;
+            idCompras = _indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idProduto)][pos].ids;
         }
         
         if (idCompras == nullptr) continue;
