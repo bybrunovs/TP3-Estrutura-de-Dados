@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <chrono>
 
 #include "Mercado.h"
 #include "Vector.h"
@@ -19,6 +20,8 @@ static bool temOperadorBooleano(const std::string &linha)
 
 int main(int argc, char *argv[])
 {
+    // começa a contar  o tempo de execucao
+    auto start = std::chrono::high_resolution_clock::now();
     try
     {
         Mercado mercado;
@@ -156,5 +159,9 @@ int main(int argc, char *argv[])
         std::cerr << "Erro: " << e.what() << '\n';
     }
 
+    // Calculo tempo de execução
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duracao = end - start;
+    std::cerr << "Tempo da consulta: " << duracao.count() << " s" << std::endl;
     return 0;
 }

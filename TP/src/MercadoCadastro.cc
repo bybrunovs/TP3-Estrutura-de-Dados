@@ -15,15 +15,41 @@ int Mercado::precedencia(const std::string &op)
 
 // Construtor — inicializa os vetores de árvores AVL para cada atributo indexável
 
-Mercado::Mercado()
-    : _usuarios(0), _produtos(0), _compras(0), _reposicoes(0)
-{
-    // 11 índices inteiros (ver enum PesquisavelInt) e 8 índices string (ver enum PesquisavelString)
-    TADS::ArvoreAVL<unsigned, TADS::ListaOrdenada<unsigned>> arvoreInt;
-    this->_indicesInt = TADS::Vector<TADS::ArvoreAVL<unsigned, TADS::ListaOrdenada<unsigned>>>(11, arvoreInt);
+Mercado::Mercado() : _usuarios(0), _produtos(0), _compras(0), _reposicoes(0) {
+    // Criamos vetores vazios para servirem de modelo (valor padrão)
+    TADS::Vector<EntradaIndiceInt> vetorIntPadrao(0); 
+    this->_indicesInt = TADS::Vector<TADS::Vector<EntradaIndiceInt>>(11, vetorIntPadrao);
 
-    TADS::ArvoreAVL<std::string, TADS::ListaOrdenada<unsigned>> arvoreString;
-    this->_indicesString = TADS::Vector<TADS::ArvoreAVL<std::string, TADS::ListaOrdenada<unsigned>>>(8, arvoreString);
+    TADS::Vector<EntradaIndiceString> vetorStringPadrao(0);
+    this->_indicesString = TADS::Vector<TADS::Vector<EntradaIndiceString>>(8, vetorStringPadrao);
+}
+
+int Mercado::buscarBinariaInt(PesquisavelInt idx, unsigned chave) const {
+    const auto& vetor = _indicesInt[static_cast<unsigned>(idx)];
+    if (vetor.tamanho() == 0) return -1;
+    unsigned esq = 0;
+    unsigned dir = vetor.tamanho() - 1;
+    while (esq <= dir) {
+        unsigned meio = esq + (dir - esq) / 2;
+        if (vetor[meio].chave == chave) return meio;
+        else if (vetor[meio].chave < chave) esq = meio + 1;
+        else { if (meio == 0) break; dir = meio - 1; }
+    }
+    return -1;
+}
+
+int Mercado::buscarBinariaString(PesquisavelString idx, const std::string &chave) const {
+    const auto& vetor = _indicesString[static_cast<unsigned>(idx)];
+    if (vetor.tamanho() == 0) return -1;
+    unsigned esq = 0;
+    unsigned dir = vetor.tamanho() - 1;
+    while (esq <= dir) {
+        unsigned meio = esq + (dir - esq) / 2;
+        if (vetor[meio].chave == chave) return meio;
+        else if (vetor[meio].chave < chave) esq = meio + 1;
+        else { if (meio == 0) break; dir = meio - 1; }
+    }
+    return -1;
 }
 
 // Função para comparar doubles com uma tolerância
@@ -154,32 +180,49 @@ void inserirOrdenado(TADS::Vector<Produto> &produtos, TADS::Vector<TADS::ListaOr
 
 // Se a chave já existe, adiciona o id na lista existente.
 // Se não existe, cria uma nova lista com o id e insere na árvore.
-void Mercado::indexarInt(PesquisavelInt qual, unsigned chave, unsigned id)
-{
-    auto &arvore = _indicesInt[static_cast<unsigned>(qual)];
-    TADS::ListaOrdenada<unsigned> *lista = arvore.buscar(chave);
-    if (lista == nullptr)
-    {
-        TADS::ListaOrdenada<unsigned> novaLista;
-        novaLista.inserir(id);
-        arvore.inserir(chave, novaLista);
+void Mercado::indexarInt(PesquisavelInt qual, unsigned chave, unsigned id) {
+    auto& vetor = _indicesInt[static_cast<unsigned>(qual)];
+    int pos = buscarBinariaInt(qual, chave);
+    
+    if (pos != -1) {
+        vetor[pos].ids.inserir(id);
+    } else {
+        EntradaIndiceInt nova;
+        nova.chave = chave;
+        nova.ids.inserir(id);
+        vetor.push_back(nova);
+        
+        // Mantém o vetor ordenado movendo a nova entrada para a esquerda
+        unsigned i = vetor.tamanho() - 1;
+        while (i > 0 && vetor[i].chave < vetor[i - 1].chave) {
+            EntradaIndiceInt temp = vetor[i - 1];
+            vetor[i - 1] = vetor[i];
+            vetor[i] = temp;
+            i--;
+        }
     }
-    else
-        lista->inserir(id);
 }
 
-void Mercado::indexarString(PesquisavelString qual, const std::string &chave, unsigned id)
-{
-    auto &arvore = _indicesString[static_cast<unsigned>(qual)];
-    TADS::ListaOrdenada<unsigned> *lista = arvore.buscar(chave);
-    if (lista == nullptr)
-    {
-        TADS::ListaOrdenada<unsigned> novaLista;
-        novaLista.inserir(id);
-        arvore.inserir(chave, novaLista);
+void Mercado::indexarString(PesquisavelString qual, const std::string &chave, unsigned id) {
+    auto& vetor = _indicesString[static_cast<unsigned>(qual)];
+    int pos = buscarBinariaString(qual, chave);
+    
+    if (pos != -1) {
+        vetor[pos].ids.inserir(id);
+    } else {
+        EntradaIndiceString nova;
+        nova.chave = chave;
+        nova.ids.inserir(id);
+        vetor.push_back(nova);
+        
+        unsigned i = vetor.tamanho() - 1;
+        while (i > 0 && vetor[i].chave < vetor[i - 1].chave) {
+            EntradaIndiceString temp = vetor[i - 1];
+            vetor[i - 1] = vetor[i];
+            vetor[i] = temp;
+            i--;
+        }
     }
-    else
-        lista->inserir(id);
 }
 
 // Índice de preço (double), separado pois usa uma AVL própria (_indicesDouble)
@@ -202,66 +245,86 @@ void Mercado::indexarDouble(double chave, unsigned id)
 // Se primeiroFiltro=true, inicializa resultado com a lista encontrada.
 // Caso contrário, faz a interseção com o resultado já acumulado.
 // Se a chave não existe no índice, resultado vira vazio.
-void Mercado::aplicarFiltroInt(PesquisavelInt idx, unsigned chave, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro)
-{
-    TADS::ListaOrdenada<unsigned> *lista = _indicesInt[static_cast<unsigned>(idx)].buscar(chave);
-    if (lista == nullptr)
-    {
+void Mercado::aplicarFiltroInt(PesquisavelInt idx, unsigned chave, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro) {
+    int pos = buscarBinariaInt(idx, chave);
+    if (pos == -1) {
         resultado = TADS::ListaOrdenada<unsigned>();
         primeiroFiltro = false;
-    }
-    else if (primeiroFiltro)
-    {
-        resultado = *lista;
+    } else if (primeiroFiltro) {
+        resultado = _indicesInt[static_cast<unsigned>(idx)][pos].ids;
         primeiroFiltro = false;
+    } else {
+        resultado = TADS::intersecao(resultado, _indicesInt[static_cast<unsigned>(idx)][pos].ids);
     }
-    else
-        resultado = TADS::intersecao(resultado, *lista);
 }
 
-void Mercado::aplicarFiltroString(PesquisavelString idx, const std::string &chave,
-                                  TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro)
-{
-    TADS::ListaOrdenada<unsigned> *lista = _indicesString[static_cast<unsigned>(idx)].buscar(chave);
-    if (lista == nullptr)
-    {
+void Mercado::aplicarFiltroString(PesquisavelString idx, const std::string &chave, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro) {
+    int pos = buscarBinariaString(idx, chave);
+    if (pos == -1) {
         resultado = TADS::ListaOrdenada<unsigned>();
         primeiroFiltro = false;
-    }
-    else if (primeiroFiltro)
-    {
-        resultado = *lista;
+    } else if (primeiroFiltro) {
+        resultado = _indicesString[static_cast<unsigned>(idx)][pos].ids;
         primeiroFiltro = false;
+    } else {
+        resultado = TADS::intersecao(resultado, _indicesString[static_cast<unsigned>(idx)][pos].ids);
     }
-    else
-        resultado = TADS::intersecao(resultado, *lista);
 }
 
-// buscarIntervalo retorna ListaOrdenada<ListaOrdenada<unsigned>>* onde cada nó da AVL
-// dentro do intervalo contribui com sua lista de ids.
-void Mercado::aplicarFiltroIntervaloInt(PesquisavelInt idx, unsigned min, unsigned max, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro)
-{
-    TADS::ListaOrdenada<TADS::ListaOrdenada<unsigned>> *listas = _indicesInt[static_cast<unsigned>(idx)].buscarIntervalo(min, max);
+void Mercado::aplicarFiltroIntervaloInt(PesquisavelInt idx, unsigned min, unsigned max, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro) {
+    const auto& vetor = _indicesInt[static_cast<unsigned>(idx)];
+    unsigned n = vetor.tamanho();
+    unsigned inicio = n, fim = n;
+    
+    // Busca Limite Inferior
+    unsigned esq = 0, dir = n - 1;
+    while (esq <= dir) {
+        unsigned meio = esq + (dir - esq) / 2;
+        if (vetor[meio].chave >= min) {
+            inicio = meio;
+            if (meio == 0) break;
+            dir = meio - 1;
+        } else {
+            esq = meio + 1;
+        }
+    }
+    
+    // Busca Limite Superior
+    if (n > 0) {
+        esq = 0; dir = n - 1;
+        while (esq <= dir) {
+            unsigned meio = esq + (dir - esq) / 2;
+            if (vetor[meio].chave <= max) {
+                fim = meio;
+                esq = meio + 1;
+            } else {
+                if (meio == 0) break;
+                dir = meio - 1;
+            }
+        }
+    }
 
     TADS::ListaOrdenada<unsigned> listaResultado;
-    for (unsigned i = 0; i < listas->tamanho(); i++)
-        for (unsigned j = 0; j < (*listas)[i].tamanho(); j++)
-            listaResultado.inserir((*listas)[i][j]);
-    delete listas;
+    if (inicio != n && fim != n && inicio <= fim) {
+        for (unsigned i = inicio; i <= fim; i++) {
+            for (unsigned j = 0; j < vetor[i].ids.tamanho(); j++) {
+                listaResultado.inserir(vetor[i].ids[j]);
+            }
+        }
+    }
 
-    if (listaResultado.tamanho() == 0)
-    {
+    if (listaResultado.tamanho() == 0) {
         resultado = TADS::ListaOrdenada<unsigned>();
         primeiroFiltro = false;
         return;
     }
-    if (primeiroFiltro)
-    {
+    
+    if (primeiroFiltro) {
         resultado = listaResultado;
         primeiroFiltro = false;
-    }
-    else
+    } else {
         resultado = TADS::intersecao(resultado, listaResultado);
+    }
 }
 
 void Mercado::aplicarFiltroIntervaloDouble(double min, double max, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro)
@@ -319,11 +382,14 @@ void Mercado::cadastrarProduto(const std::string &nome, double preco, unsigned q
 
 // Atualiza o índice de qtd após uma mudança de estoque
 // remove o produto da lista da qtd antiga e insere na nova
-void Mercado::atualizarIndiceQtd(unsigned idProd, unsigned qtdAntiga, unsigned qtdNova)
-{
-    TADS::ListaOrdenada<unsigned> *lista = _indicesInt[static_cast<unsigned>(PesquisavelInt::produto_qtd)].buscar(qtdAntiga);
-    if (lista != nullptr && lista->contains(idProd))
-        lista->deletar(idProd);
+void Mercado::atualizarIndiceQtd(unsigned idProd, unsigned qtdAntiga, unsigned qtdNova) {
+    int pos = buscarBinariaInt(PesquisavelInt::produto_qtd, qtdAntiga);
+    if (pos != -1) {
+        auto& vetor = _indicesInt[static_cast<unsigned>(PesquisavelInt::produto_qtd)];
+        if (vetor[pos].ids.contains(idProd)) {
+            vetor[pos].ids.deletar(idProd);
+        }
+    }
     indexarInt(PesquisavelInt::produto_qtd, qtdNova, idProd);
 }
 

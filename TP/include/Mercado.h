@@ -65,11 +65,27 @@ private:
     TADS::Vector<Compra> _compras;
     TADS::Vector<Reposicao> _reposicoes;
 
+
+        // 1. Adicione as structs na área private da classe Mercado:
+    struct EntradaIndiceInt
+    {
+        unsigned chave;
+        TADS::ListaOrdenada<unsigned> ids;
+    };
+
+    struct EntradaIndiceString
+    {
+        std::string chave;
+        TADS::ListaOrdenada<unsigned> ids;
+    };
+
     // Índices invertidos por valor exato
-    TADS::Vector<TADS::ArvoreAVL<unsigned, TADS::ListaOrdenada<unsigned>>> _indicesInt;
-    TADS::Vector<TADS::ArvoreAVL<std::string, TADS::ListaOrdenada<unsigned>>> _indicesString;
+TADS::Vector<TADS::Vector<EntradaIndiceInt>> _indicesInt;
+TADS::Vector<TADS::Vector<EntradaIndiceString>> _indicesString;
     TADS::Vector<TADS::ListaOrdenada<unsigned>> _indicesDouble;
 
+    int buscarBinariaInt(PesquisavelInt idx, unsigned chave) const;
+int buscarBinariaString(PesquisavelString idx, const std::string &chave) const;
     /**
      * @brief Insere um id em um índice invertido inteiro.
      *

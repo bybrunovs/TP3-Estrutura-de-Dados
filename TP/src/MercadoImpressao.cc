@@ -34,8 +34,14 @@ void Mercado::imprimirUsuarios(const TADS::ListaOrdenada<unsigned> &ids, const s
                   << " " << u.getNacionalidade() << std::endl;
 
         // Busca todas as compras do usuário e soma qtd por produto
-        TADS::ListaOrdenada<unsigned> *idCompras =
-            _indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idUsuario)].buscar(idUsuario);
+// Busca todas as compras do usuário e soma qtd por produto
+        int pos = buscarBinariaInt(PesquisavelInt::compra_idUsuario, idUsuario);
+        TADS::ListaOrdenada<unsigned> *idCompras = nullptr;
+        
+        if (pos != -1) {
+            idCompras = &_indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idUsuario)][pos].ids;
+        }
+        
         if (idCompras == nullptr) continue;
 
         TADS::Vector<unsigned> qtdPorProduto(_produtos.tamanho(), 0);
@@ -69,8 +75,14 @@ void Mercado::imprimirProdutos(const TADS::ListaOrdenada<unsigned> &ids, const s
                   << " " << p.getCondicao() << std::endl;
 
         // Busca todas as compras do produto e soma qtd por usuário
-        TADS::ListaOrdenada<unsigned> *idCompras =
-            _indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idProduto)].buscar(idProduto);
+// Busca todas as compras do produto e soma qtd por usuário
+        int pos = buscarBinariaInt(PesquisavelInt::compra_idProduto, idProduto);
+        TADS::ListaOrdenada<unsigned> *idCompras = nullptr;
+        
+        if (pos != -1) {
+            idCompras = &_indicesInt[static_cast<unsigned>(PesquisavelInt::compra_idProduto)][pos].ids;
+        }
+        
         if (idCompras == nullptr) continue;
 
         TADS::Vector<unsigned> qtdPorUsuario(_usuarios.tamanho(), 0);
