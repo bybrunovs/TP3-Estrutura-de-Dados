@@ -90,6 +90,11 @@ private:
      */
     void indexarString(PesquisavelString qual, const std::string &chave, unsigned id);
 
+        /**
+     * @brief Insere um id em um índice invertido double.
+     * @param chave Chave a indexar.
+     * @param id    ID da entidade a associar.
+     */
     void indexarDouble(double chave, unsigned id);
 
     void aplicarFiltroInt(PesquisavelInt idx, unsigned chave, TADS::ListaOrdenada<unsigned> &resultado, bool &primeiroFiltro);

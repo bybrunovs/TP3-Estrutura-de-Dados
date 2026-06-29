@@ -3,8 +3,8 @@
 
 # Folder
 testes/
-analise_experimental/*/data/
-analise_experimental/*/in/
+analise_experimental/*
+
 
 # Prerequisites
 *.d

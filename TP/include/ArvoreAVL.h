@@ -48,13 +48,14 @@ namespace TADS
     private:
         No<TipoChave, TipoDado> *_raiz = nullptr;
 
+        //Funções recursivas
         void insereRecursivo(No<TipoChave, TipoDado> *&no, const TipoChave &chave, const TipoDado &dado);
         void deletarRecursivo(No<TipoChave, TipoDado> *&no, const TipoChave &chave);
         No<TipoChave, TipoDado> *buscarRecursivo(No<TipoChave, TipoDado> *no, const TipoChave &chave) const;
         No<TipoChave, TipoDado> *copiarRecursivo(const No<TipoChave, TipoDado> *no) const;
-
         void limparRecursivo(No<TipoChave, TipoDado> *no);
 
+        //rotações
         void rotacionarEsq(No<TipoChave, TipoDado> *&no);
         void rotacionarDir(No<TipoChave, TipoDado> *&no);
 
@@ -81,10 +82,7 @@ namespace TADS
 
         /**
          * @brief Retorna um Vector com os dados de todos os nós cuja chave está em [min, max].
-         *
          * Os dados são retornados em ordem crescente de chave (in-order).
-         * Complexidade: O(log n + k), onde k é o número de resultados.
-         *
          * @param min Limite inferior do intervalo (inclusivo).
          * @param max Limite superior do intervalo (inclusivo).
          * @return Vector<TipoDado> com os dados encontrados.
